@@ -8,30 +8,33 @@ rospy.sleep(5)
 
 
 #%%
-LfD.save_as_home()
-#%%
-LfD.load_home_pose()
-#%%
-LfD.go_to_home()
+LfD.home()
 #%%
 LfD.traj_rec()
-
-#%%
-# LfD.traj_rec_keyboard()
-#%%
-LfD.save()
 #%%
 LfD.save(file="left")
+#%%
+LfD.load(file="left")
+#%%
+LfD.home()
+#%%
+LfD.traj_rec()
 #%%
 LfD.save(file="right")
 # Execute left trajectory
 #%%
-LfD.load(file="left")
+LfD.load(file="right")
 #%%
+LfD.home_gripper() # homeing the gripper allows to kinestheicall move it. 
+rospy.sleep(2)
 LfD.execute()
 # Execute left trajectory
 #%%
 LfD.load(file="right")
 #%%
+LfD.home_gripper() # homeing the gripper allows to kinestheicall move it. 
+rospy.sleep(2)
 LfD.execute()
+# %%
+LfD.home()
 # %%

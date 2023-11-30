@@ -45,7 +45,7 @@ class Panda():
         self.home_command = HomingActionGoal()
         self.stop_command = StopActionGoal()
         self.curr_grip_width = 0.0
-        # self.grip_width = 0.0
+        self.gripper_width = 0.0
         self.move_command.goal.speed=1
         self.grasp_command.goal.epsilon.inner = 0.3
         self.grasp_command.goal.epsilon.outer = 0.3
@@ -75,14 +75,9 @@ class Panda():
         goal.header.seq = 1
         goal.header.stamp = rospy.Time.now()
 
-        ns_msg = [0, 0, 0, -2.4, 0, 2.4, 0]
         self.go_to_pose(goal)
-        self.set_configuration(ns_msg)
-        self.set_K.update_configuration({f'{str(self.name)}_nullspace_stiffness':10})
 
         rospy.sleep(rospy.Duration(secs=5))
-
-        self.set_K.update_configuration({f'{str(self.name)}_nullspace_stiffness':0})
 
     def home_gripper(self):
         self.homing_pub.publish(self.home_command)
@@ -96,7 +91,7 @@ class Panda():
 
     def joint_states_callback(self, data):
         self.curr_joint = data.position[:7]
-        self.curr_gripper_width = data.position[7] + data.position[8]
+        self.gripper_width = data.position[7] + data.position[8]
         
     def set_stiffness(self, k_t1, k_t2, k_t3,k_r1,k_r2,k_r3, k_ns):
         

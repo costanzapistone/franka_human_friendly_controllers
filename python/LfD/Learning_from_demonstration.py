@@ -25,7 +25,7 @@ class LfD(Panda):
 
         self.gripper_close_width = 0
         self.gripper_open_width  = 0.06
-        self.gripper_sensitivity= 0.03
+        self.gripper_sensitivity= 0.01
 
 
         self.home_pose = None
@@ -65,7 +65,7 @@ class LfD(Panda):
         
         print("Recording started. Press ESC to stop.")
         while not self.end:
-            if self.curr_grip_width < (self.gripper_open_width - self.gripper_sensitivity):
+            if self.gripper_width < (self.gripper_open_width - self.gripper_sensitivity):
                 # print("Close gripper")
                 self.grip_value = 0 #Close the gripper
             else:
@@ -110,7 +110,7 @@ class LfD(Panda):
         
         print("Recording started. Press ESC to stop.")
         while not self.end:
-            if self.curr_grip_width < (self.gripper_open_width - self.gripper_sensitivity):
+            if self.gripper_width < (self.gripper_open_width - self.gripper_sensitivity):
                 # print("Close gripper")
                 self.grip_value = 0 #Close the gripper
             else:
