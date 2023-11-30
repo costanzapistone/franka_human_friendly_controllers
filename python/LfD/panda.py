@@ -45,6 +45,7 @@ class Panda():
         self.home_command = HomingActionGoal()
         self.stop_command = StopActionGoal()
         self.curr_grip_width = 0.0
+        # self.grip_width = 0.0
         self.move_command.goal.speed=1
         self.grasp_command.goal.epsilon.inner = 0.3
         self.grasp_command.goal.epsilon.outer = 0.3

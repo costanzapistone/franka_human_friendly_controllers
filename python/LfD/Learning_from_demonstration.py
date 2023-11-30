@@ -27,6 +27,11 @@ class LfD(Panda):
         self.gripper_open_width  = 0.06
         self.gripper_sensitivity= 0.03
 
+
+        self.home_pose = None
+        self.home_ori = None
+        self.home_grip = None
+
         self.listener = Listener(on_press=self._on_press)
         self.listener.start()
 
@@ -60,7 +65,7 @@ class LfD(Panda):
         
         print("Recording started. Press ESC to stop.")
         while not self.end:
-            if self.gripper_width < (self.gripper_open_width - self.gripper_sensitivity):
+            if self.curr_grip_width < (self.gripper_open_width - self.gripper_sensitivity):
                 # print("Close gripper")
                 self.grip_value = 0 #Close the gripper
             else:
@@ -105,7 +110,7 @@ class LfD(Panda):
         
         print("Recording started. Press ESC to stop.")
         while not self.end:
-            if self.gripper_width < (self.gripper_open_width - self.gripper_sensitivity):
+            if self.curr_grip_width < (self.gripper_open_width - self.gripper_sensitivity):
                 # print("Close gripper")
                 self.grip_value = 0 #Close the gripper
             else:
@@ -161,12 +166,64 @@ class LfD(Panda):
                 self.time_index=self.time_index+1
             self.r.sleep()
 
+
+    def go_to_home(self):
+        self.set_stiffness(1000, 1000, 1000, 30, 30, 30, 0)
+        start = PoseStamped()
+        self.grasp_gripper(self.recorded_gripper[0][0], self.max_gripper_force)
+        quat_start = list_2_quaternion(self.home_ori[:, 0])
+        start = array_quat_2_pose(self.home_traj[:, 0], quat_start)
+        
+        self.go_to_pose(start)
+
+        # self.time_index=0
+        # while self.time_index <( self.recorded_traj.shape[1]):
+
+        #     quat_goal = list_2_quaternion(self.recorded_ori[:, self.time_index])
+        #     goal = array_quat_2_pose(self.recorded_traj[:, self.time_index], quat_goal)
+        #     goal.header.seq = 1
+        #     goal.header.stamp = rospy.Time.now()
+
+                   
+        #     if (self.recorded_gripper[0][self.time_index]-self.recorded_gripper[0][max([0,self.time_index-1])]) < -self.gripper_sensitivity:
+        #         print("closing gripper")
+        #         self.grasp_gripper(self.recorded_gripper[0][self.time_index], self.max_gripper_force)
+        #         time.sleep(0.1)
+
+        #     if (self.recorded_gripper[0][self.time_index]-self.recorded_gripper[0][max([0,self.time_index-1])]) > self.gripper_sensitivity:
+        #         print("open gripper")
+        #         self.move_gripper(self.recorded_gripper[0][self.time_index])
+        #         time.sleep(0.1)
+
+        #     self.goal_pub.publish(goal)
+
+        #     # Safety feature in case somebody is touching the robot during execution
+        #     goal_pos_array = position_2_array(goal.pose.position)
+        #     if np.linalg.norm(self.curr_pos-goal_pos_array) <= self.attractor_distance_threshold:
+        #         self.time_index=self.time_index+1
+        #     self.r.sleep()
+
     def save(self, file='last'):
         curr_dir=os.getcwd()
         np.savez(curr_dir+ '/data/' + str(file) + '.npz',
                  traj=self.recorded_traj,
                  ori=self.recorded_ori,
                  grip=self.recorded_gripper)
+
+    def save_as_home(self, file='home_pose'):
+        curr_dir=os.getcwd()
+        np.savez(curr_dir+ '/data/' + str(file) + '.npz',
+                 traj=self.curr_pos,
+                 ori=self.curr_ori,
+                 grip=self.gripper_open_width)
+                 
+    def load_home_pose(self, file='home_pose'):
+        curr_dir=os.getcwd()
+        data = np.load(curr_dir+ '/data/' + str(file) + '.npz')
+        self.home_pose = data['traj']
+        self.home_ori = data['ori']
+        self.home_grip = data['grip']
+        self.filename=str(file)
 
     def load(self, file='last'):
         curr_dir=os.getcwd()
@@ -175,3 +232,5 @@ class LfD(Panda):
         self.recorded_ori = data['ori']
         self.recorded_gripper = data['grip']
         self.filename=str(file)
+
+# %%
